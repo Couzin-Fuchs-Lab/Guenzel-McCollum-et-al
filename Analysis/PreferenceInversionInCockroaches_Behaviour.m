@@ -1,33 +1,29 @@
 %% Social modulation of individual preferences in cockroaches
-% In social species, decision-making is both influenced by, and in turn 
+% 
+% Summary:
+% In social species, decision-making is both influenced by, and in turn
 % influences, the social context. This reciprocal feedback introduces 
-% coupling across scales of biological organization, from the neural basis 
-% of sensing, to individual and collective decision-making. Here we employ 
-% an integrative approach, using cockroaches as a model system, to 
-% investigate individual decision-making in dynamical social contexts. 
-% Specifically, we investigate a known preference inversion exhibited by 
-% cockroaches: when choosing shelters, isolated individuals prefer 
-% vanillin-scented (an odour associated with food) shelters over unscented 
-% ones; yet when making the same decision as a collective this preference 
-% is reversed. We demonstrate that this inversion can be replicated by 
-% replacing the full social context with only social odour cues (faeces 
-% extract), highlighting the importance of olfaction in mediating 
-% individuals’ Behavioural response. While vanillin and social odour, when 
-% presented alone, make shelters more attractive, when presented together 
-% the valence of the mixture changes, with individuals preferring unscented 
-% shelters. Calcium imaging of cockroaches' antennal lobes shows that the 
-% neural activity in vanillin-responsive regions reduces as social odour 
-% concentration increases. This suggests that the Behavioural inversion may 
-% be a result of changing odour representation in the primary olfactory 
-% centre, a mechanism that would naturally result in individuals avoiding 
-% what they perceive as recently exploited resources.
-%(Abstract)
+% coupling across scales, from the neural basis of sensing, to individual
+% and collective decision-making. Here, we adopt an integrative approach 
+% investigating decision-making in dynamical social contexts. When choosing
+% shelters, isolated cockroaches prefer vanillin-scented (food-associated) 
+% shelters over unscented ones, yet in groups, this preference is inverted.
+% We demonstrate that this inversion can be replicated by replacing the 
+% full social context with social odours: presented alone food and social 
+% odours are attractive, yet when presented as a mixture they are avoided. 
+% Via antennal lobe calcium imaging, we show that neural activity in 
+% vanillin-responsive regions reduces as social odour concentration 
+% increases. Thus, we suggest that the mixture is evaluated as a distinct 
+% olfactory object with opposite valence, providing a mechanism that 
+% would naturally result in individuals avoiding what they perceive as 
+% recently exploited resources.
 %
-% This script pools behavioural data, depicts them as figures, and
-% calculates statistics.
+% This script represents the pipeline used to analyse behavioural data.
+% It first pools data across different trials, then analyses them in terms
+% of, for example, how much time animals spent in any of the two shelters,
+% last the script creates figures and calculates statistics.
 %
-% Verion: Final version for submission
-%    30-July-2020; Yannick (MATLAB 2020a)
+% (MATLAB 2020a)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

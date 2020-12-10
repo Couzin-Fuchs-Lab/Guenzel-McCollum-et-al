@@ -1,53 +1,31 @@
 %% PreferenceInversionInCockroaches_Physiology
-% We adopted a ratiometric protocol for calcium imaging using Fura-2
-% excitation wavelengths of 340 and 380nm. Ratios of 340 to 380nm signals
-% were calculated (R340/380) and the offset was removed by subtracting
-% the mean signal before odour stimulation (Delta R340/380). Response
-% maps for each frame were smoothed with a 4-by-4 window using 2D median
-% filtering. For each repetition, the response to the solvent (mineral oil)
-% was subtracted from all stimulus-induced responses, and the average odour
-% response map was calculated across the 3 (or 4) repetitions of each
-% stimulus conditions. Regions of interest (ROIs) were automatically
-% segmented using k-medoids functional clustering on all time traces of
-% all active pixels, i.e. regions showing a stimulus-induced increase in
-% fluorescence Delta R340/380 > 0.01 for at least one of the five
-% odours. For the cluster analysis, we considered each active pixel as
-% object, whose features were the concatenated responses to each stimulus,
-% resulting in 400 features (five stimuli times 80 frames per stimulus).
-% Dimensionality was then reduced by principal component analysis on the
-% input data set. Thus, to group pixels based on their activity, we only
-% considered the principal components that together explain 95% of the
-% variance. The initial cluster central positions were determined using a
-% preliminary clustering phase on a random subsample of 10% of the
-% data. The algorithm ran until a maximum number of 10'000 iterations over
-% 100 replicates. We set the number of clusters - thus the number of
-% ROIs - to k=25, as this reflects the total possible number of
-% response types of five different stimuli (k=N^s; for N=5 odour
-% stimuli and s=2 ways of responding, i.e. 'response' vs. 'no
-% response'), and provides a good approximation of the number of
-% glomeruli that can be detected on a superficial plane of the
-% cockroach antennal lobe. Other parameters, e.g. the distance
-% metric, were kept at their default (standardized Euclidean distance
-% in this example; see MATLAB's kmedoids-function for details). Since
-% medoid-initialisation is based on random processes, we repeated the
-% clustering 20 times and evaluated the resulting variability with the
-% mean within-pixel Eucidean distance between the 20 assigned medoids,
-% scaled by the mean between-ROI Eucidean distance resulting from the
-% 20 runs (figure S3D and S4D). Resulting ROIs were sorted according
-% to their response to vanillin (van10^-2). For each individual,
-% stimulus-specific response vectors were obtained as mean responses of
-% each ROI across repetitions. Response similarities were then assessed
-% by calculating the Pearson's correlation coefficients between response
-% vectors of the different odour conditions, which were then used to
-% construct a dendrogram according to an agglomerative hierarchical
-% clustering method (following the same principle as for the behavioural
-% data - see subsection 'Tracking and data analysis' above). For graphical
-% representation, responses' heatmaps (figure 5B and figure S2) present
-% average odour response maps between 0.6 s and 1s after stimulus
-% onset, across repetitions.
+% 
+% Summary:
+% In social species, decision-making is both influenced by, and in turn
+% influences, the social context. This reciprocal feedback introduces 
+% coupling across scales, from the neural basis of sensing, to individual
+% and collective decision-making. Here, we adopt an integrative approach 
+% investigating decision-making in dynamical social contexts. When choosing
+% shelters, isolated cockroaches prefer vanillin-scented (food-associated) 
+% shelters over unscented ones, yet in groups, this preference is inverted.
+% We demonstrate that this inversion can be replicated by replacing the 
+% full social context with social odours: presented alone food and social 
+% odours are attractive, yet when presented as a mixture they are avoided. 
+% Via antennal lobe calcium imaging, we show that neural activity in 
+% vanillin-responsive regions reduces as social odour concentration 
+% increases. Thus, we suggest that the mixture is evaluated as a distinct 
+% olfactory object with opposite valence, providing a mechanism that 
+% would naturally result in individuals avoiding what they perceive as 
+% recently exploited resources.
 %
-% Verion:
-%    22-Oct-2020; Yannick (MATLAB 2020a)
+% This script represents the pipeline used to analyse calcium-imaging data.
+% It uses baseline-subtracted Delta R340/380 2D fluorescence time courses
+% and applies a k-medoids cluster analysis on active pixels 
+% (fluorescence > 0.01 for at least one of the five odours).
+%
+% (MATLAB 2020a)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clc; clear all; close all
 
@@ -505,7 +483,7 @@ for iFile = 1:length(SET.FileNames)
             % Special treatment for examples
             if strcmp(SET.FileNames{iFile}(1:end-4), '181217_mp03_dff') || strcmp(SET.FileNames{iFile}(1:end-4), '181219_mp04_dff')
                 hold on
-                cm = jet(size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterMedoids, 1));
+                cm = viridis(size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterMedoids, 1));
                 % Iterate over cluster and add boundaries
                 for iCluster = 1:length(SET.Examples.(['file_', SET.FileNames{iFile}(1:end-4)]).Cluster)
                     % Get current cluster's pixels
@@ -536,34 +514,34 @@ for iFile = 1:length(SET.FileNames)
         ylim([0.5, size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF', 1)+0.5])
         box off
         set(gca, 'XTick', [], 'YTick', [])
-        colormap(ax(iOdor+1), jet(50))
-%         % Special treatment for examples
-%         if strcmp(SET.FileNames{iFile}(1:end-4), '181217_mp03_dff') || strcmp(SET.FileNames{iFile}(1:end-4), '181219_mp04_dff')
-%             caxis(SET.Examples.caxis)
-%             hold on
-%             % Iterate over cluster and add boundaries
-%             for iCluster = 1:length(SET.Examples.(['file_', SET.FileNames{iFile}(1:end-4)]).Cluster)
-%                 % Get current cluster's pixels
-%                 idx = find(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterID == SET.Examples.(['file_', SET.FileNames{iFile}(1:end-4)]).Cluster(iCluster));
-%                 % Create a BW image of only the current cluster's
-%                 % pixels being white
-%                 BW = zeros(size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF, 1), size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF, 2));
-%                 for iPX = 1:length(idx)
-%                     BW(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterTabel.coordinates(idx(iPX), 1), DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterTabel.coordinates(idx(iPX), 2)) = 1;
-%                 end%iPX
-%                 BW = BW';
-%                 % Draw cluster's outlines
-%                 [B, L] = bwboundaries(BW, 'noholes');
-%                 for k = 1:length(B)
-%                     boundary = B{k};
-%                     plot(boundary(:, 2), boundary(:, 1), 'w', 'LineWidth', 1)
-%                 end%k
-%                 clear k B L BW idx
-%             end%iCluster
-%             clear cm
-%         else
+        colormap(ax(iOdor+1), viridis(50))
+        % Special treatment for examples
+        if strcmp(SET.FileNames{iFile}(1:end-4), '181217_mp03_dff') || strcmp(SET.FileNames{iFile}(1:end-4), '181219_mp04_dff')
+            caxis(SET.Examples.caxis)
+            hold on
+            % Iterate over cluster and add boundaries
+            for iCluster = 1:length(SET.Examples.(['file_', SET.FileNames{iFile}(1:end-4)]).Cluster)
+                % Get current cluster's pixels
+                idx = find(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterID == SET.Examples.(['file_', SET.FileNames{iFile}(1:end-4)]).Cluster(iCluster));
+                % Create a BW image of only the current cluster's
+                % pixels being white
+                BW = zeros(size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF, 1), size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF, 2));
+                for iPX = 1:length(idx)
+                    BW(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterTabel.coordinates(idx(iPX), 1), DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterTabel.coordinates(idx(iPX), 2)) = 1;
+                end%iPX
+                BW = BW';
+                % Draw cluster's outlines
+                [B, L] = bwboundaries(BW, 'noholes');
+                for k = 1:length(B)
+                    boundary = B{k};
+                    plot(boundary(:, 2), boundary(:, 1), 'w', 'LineWidth', 1)
+                end%k
+                clear k B L BW idx
+            end%iCluster
+            clear cm
+        else
             caxis([min(min(DATA.ClusterResponse_all.mat)), max(max(DATA.ClusterResponse_all.mat))])
-%         end%if
+        end%if
         cb = colorbar;
         cb.Location = 'southoutside';
         title(SET.OdorNames{iOdor})
@@ -586,7 +564,7 @@ for iFile = 1:length(SET.FileNames)
             % Special treatment for examples
             if strcmp(SET.FileNames{iFile}(1:end-4), '181217_mp03_dff') || strcmp(SET.FileNames{iFile}(1:end-4), '181219_mp04_dff')
                 hold on
-                cm = jet(size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterMedoids, 1));
+                cm = viridis(size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).ClusterMedoids, 1));
                 % Iterate over cluster and add boundaries
                 for iCluster = 1:length(SET.Examples.(['file_', SET.FileNames{iFile}(1:end-4)]).Cluster)
                     % Get current cluster's pixels
@@ -622,11 +600,11 @@ for iFile = 1:length(SET.FileNames)
             end%iPx
             imagesc(temp')
             if min(unique(temp)) == 0
-                cm = jet(length(unique(temp)));
+                cm = viridis(length(unique(temp)));
                 cm(1, :) = 0;
                 colormap(ax_cm, cm)
             else
-                colormap(ax_cm, jet(length(unique(temp))))
+                colormap(ax_cm, viridis(length(unique(temp))))
             end
             axis equal
             xlim([0.5, size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF', 2)+0.5])
@@ -652,7 +630,7 @@ for iFile = 1:length(SET.FileNames)
         ylim([0.5, size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF', 1)+0.5])
         box off
         set(gca, 'XTick', [], 'YTick', [])
-        colormap(ax_heat(iOdor), jet(50))
+        colormap(ax_heat(iOdor), viridis(50))
         % Special treatment for examples
         if strcmp(SET.FileNames{iFile}(1:end-4), '181217_mp03_dff') || strcmp(SET.FileNames{iFile}(1:end-4), '181219_mp04_dff')
             caxis(SET.Examples.caxis)
@@ -775,7 +753,7 @@ for iFile = 1:length(SET.FileNames)
     ylim([0.5, length(SET.OdorNames)+0.5])
     box off
     set(gca, 'XTick', [], 'YTick', [])
-    colormap(ax(1,iFile), jet(50))
+    colormap(ax(1,iFile), viridis(50))
     % Special treatment for examples
     if strcmp(SET.FileNames{iFile}(1:end-4), '181217_mp03_dff') || strcmp(SET.FileNames{iFile}(1:end-4), '181219_mp04_dff')
         caxis(SET.Examples.caxis)
@@ -826,7 +804,7 @@ xlim([0.5, size(DATA.ClusterResponse_all.mat, 2)+0.5])
 ylim([0.5, size(DATA.ClusterResponse_all.mat, 1)+0.5])
 box off
 set(gca, 'XTick', [], 'YTick', [])
-colormap(ax(1), jet(50))
+colormap(ax(1), viridis(50))
 caxis([min(min(DATA.ClusterResponse_all.mat)), max(max(DATA.ClusterResponse_all.mat))])
 cb = colorbar;
 cb.Location = 'southoutside';
@@ -972,7 +950,7 @@ for iFile = 4:length(SET.FileNames)
     ylim([0.5, size(DATA.(['file_', SET.FileNames{iFile}(1:end-4)]).BF', 1)+0.5])
     box off
     set(gca, 'XTick', [], 'YTick', [])
-    cm = [0 0 0; jet(length(unique(ClusterVar))*2)];
+    cm = [0 0 0; viridis(length(unique(ClusterVar))*2)];
     colormap(cm)
     cb = colorbar;
     cb.Location = 'eastoutside';
